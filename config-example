@@ -1,0 +1,25 @@
+config.py example
+
+class Config:
+    APP_NAME = "DM_HAL"
+
+    AWS_ACCESS_KEY_ID = ""
+    AWS_ACCESS_KEY_SECRET = ""
+    AWS_REGION = ""
+    AWS_S3_BUCKET = ""
+
+class DevConfig(Config):
+    DEBUG = True
+
+    # Debugging dbs, aws endpoints, ect..
+
+class TestConfig(Config):
+    DEBUG = True
+    TEST = True
+
+    # Testing dbs aws endpoints ect ..
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+    # Production dbs, aws, endports ect ..
