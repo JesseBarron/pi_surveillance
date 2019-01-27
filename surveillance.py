@@ -1,4 +1,4 @@
-from main import app
+from settings import app
 import cv2
 import boto3
 import time
