@@ -20,6 +20,25 @@ ap.add_argument("-a", "--min-area", type=int, default=500, help="Minimum area si
 #(Native Python method)
 args = vars(ap.parse_args())
 
+#
+# Working good example of values I could use
+# thresh: 48
+# maxVal: 120
+# erodeIterations: 2
+# 
+# Threshold passes values if they're bright enough, if a pixles is part of a bigger cluster it will be passed as well
+# erosion dictates how big the clusters of pixles can be 
+#
+
+controlValDefaults = {
+  "thresh": 50,
+  "maxVal": 120,
+  "erodeIteration": 10
+}
+
+controlledVal = controlValDefaults.copy()
+i = -1
+
 # if the video argument is None, then we are reading from webcam
 if args.get('video', None) is None:
   vs = VideoStream(src=0)
@@ -69,10 +88,11 @@ while True:
 
   # Check the difference between the firstFrame and frame
   frameDelta = cv2.absdiff(firstFrame, gray) # Get the difference between firstFrame and currentFrame(gray)
-  thresh = cv2.threshold(frameDelta, 90, 255, cv2.THRESH_BINARY)[1] # returns a corse black and white image that exaggerates the difference
+  thresh = cv2.threshold(frameDelta, controlledVal['thresh'], controlledVal['maxVal'], cv2.THRESH_BINARY)[1] # returns a corse black and white image that exaggerates the difference
+  # thresh = cv2.adaptiveThreshold(frameDelta, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY+cv.THRESH_OTSU, 23, 2)
 
   # Diealate the image (fill in any holes) find the contours of the threshold image
-  thresh = cv2.dilate(thresh, None, iterations=2)
+  thresh = cv2.erode(thresh, None, iterations=controlledVal['erodeIteration'])
   cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
   cnts = imutils.grab_contours(cnts)
 
@@ -87,7 +107,31 @@ while True:
     cv2.rectangle(frame, ( x, y ), ( x +  w, y + h ), ( 0, 255, 0 ), 2)
     text = "Occupied"
 
-  cv2.imshow('Test', frame)
+  cv2.imshow('Test Frame', frame)
+  cv2.imshow('Test Delta', frameDelta)
+  cv2.imshow('Thresh Test', thresh)
 
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
+  elif cv2.waitKey(1) & 0xff == ord('r'):
+    print("reseting firstFrame")
+    firstFrame = gray
+  elif cv2.waitKey(1) & 0xff == 32:
+    i += 1
+    if i > len(controlledVal) - 1:
+      i = 0
+    print("Print Option")
+    print(list(controlledVal.keys())[i])
+  elif cv2.waitKey(1) & 0xff == 0:
+    print("Incrementing Settings")
+    print(list(controlledVal.keys())[i])
+    controlledVal[list(controlledVal.keys())[i]] += 1
+    print(controlledVal[list(controlledVal.keys())[i]])
+  elif cv2.waitKey(1) & 0xff == 1:
+    print("Reducing Settings")
+    print(list(controlledVal.keys())[i])
+    controlledVal[list(controlledVal.keys())[i]] -= 1
+    print(controlledVal[list(controlledVal.keys())[i]])
+  elif cv2.waitKey(1) & 0xff == ord('o'):
+    controlledVal = controlValDefaults.copy()
+    print(controlledVal)
