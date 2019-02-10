@@ -1,5 +1,6 @@
+import json
 from flask import Blueprint
-from camera import VideoCamera
+from .camera import VideoCamera
 
 camera_controller = Blueprint('camera_controller', __name__)
 
@@ -15,5 +16,4 @@ def startCam():
 
 @camera_controller.route('/checkDefaultSettings')
 def check():
-  print(camSing.getSettings())
-  return "There it is"
+  return json.dumps(camSing.getSettings())
