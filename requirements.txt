@@ -9,7 +9,7 @@ Jinja2==2.10
 jmespath==0.9.3
 MarkupSafe==1.1.0
 numpy==1.16.0
-opencv-python==4.0.0.21
+opencv-python==4.1.1.26
 pur==5.2.1
 python-dateutil==2.7.5
 s3transfer==0.1.13
